@@ -49,14 +49,14 @@ export async function handleAdminAPI(request, env, sys) {
          disk_total, disk_used, processes, tcp_conn, udp_conn, 
          country, ip_v4, ip_v6, server_group, price, expire_date, 
          bandwidth, traffic_limit, ping_ct, ping_cu, ping_cm, ping_bd, 
-         monthly_rx, monthly_tx, last_rx, last_tx, reset_month, sort_order) 
+         sort_order) 
         VALUES (?, ?, '0', '0', '0', '0', '0', 0, 
                 '0', '0', '0', '0', '0', 
                 '', '', '', '', '0', '0', '0', 
                 '0', '0', '0', '0', '0', 
                 'XX', '0', '0', ?, '', '', 
                 '', '', '0', '0', '0', '0', 
-                '0', '0', '0', '0', '', ?)
+                ?)
       `).bind(id, name, group, sortOrder).run();
       
       return new Response(JSON.stringify({ 

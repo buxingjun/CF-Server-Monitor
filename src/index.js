@@ -9,22 +9,9 @@ import { checkAuth, authResponse } from './middleware/auth.js';
 const historyCache = new Map();
 const CACHE_TTL = 60000;
 const MAX_HOURS = 72;
-const ONE_HOUR_MS = 60 * 60 * 1000;
 
-async function fetchHistoryData(env, sys, request, id, hours, columns) {
-  if (sys.is_public !== 'true' && !checkAuth(request, env)) {
-    return authResponse(sys.site_title);
-  }
-  
+async function fetchHistoryData(env, request, id, hours, columns) {
   if (!id) return new Response('Missing ID', { status: 400 });
-  
-  const isLoggedIn = checkAuth(request, env);
-  let serverQuery = 'SELECT id FROM servers WHERE id = ?';
-  if (!isLoggedIn) {
-    serverQuery += " AND is_hidden != '1'";
-  }
-  const server = await env.DB.prepare(serverQuery).bind(id).first();
-  if (!server) return new Response('Not Found', { status: 404 });
   
   const clampedHours = Math.min(hours, MAX_HOURS);
   
@@ -48,20 +35,8 @@ async function fetchHistoryData(env, sys, request, id, hours, columns) {
   });
 }
 
-async function fetchAggregatedHistoryData(env, sys, request, id, hours, columns) {
-  if (sys.is_public !== 'true' && !checkAuth(request, env)) {
-    return authResponse(sys.site_title);
-  }
-  
+async function fetchAggregatedHistoryData(env, request, id, hours, columns) {
   if (!id) return new Response('Missing ID', { status: 400 });
-  
-  const isLoggedIn = checkAuth(request, env);
-  let serverQuery = 'SELECT id FROM servers WHERE id = ?';
-  if (!isLoggedIn) {
-    serverQuery += " AND is_hidden != '1'";
-  }
-  const server = await env.DB.prepare(serverQuery).bind(id).first();
-  if (!server) return new Response('Not Found', { status: 404 });
   
   const clampedHours = Math.min(hours, MAX_HOURS);
   
@@ -90,12 +65,12 @@ export default {
     await initDatabase(env.DB);
 
     const url = new URL(request.url);
-    const sys = await loadSettings(env.DB);
     const method = request.method;
     const path = url.pathname;
 
     async function handleManualCleanup() {
       if (!checkAuth(request, env)) {
+        const sys = await loadSettings(env.DB);
         return authResponse(sys.admin_title);
       }
       
@@ -108,30 +83,43 @@ export default {
 
     const routes = [
       { method: 'GET', path: '/clear', handler: handleManualCleanup },
-      { method: 'POST', path: '/admin/api', handler: () => handleAdminAPI(request, env, sys) },
-      { method: 'GET', path: '/admin', handler: () => handleAdminUI(request, env, sys) },
+      { method: 'POST', path: '/admin/api', handler: async () => {
+        const sys = await loadSettings(env.DB);
+        return handleAdminAPI(request, env, sys);
+      }},
+      { method: 'GET', path: '/admin', handler: async () => {
+        const sys = await loadSettings(env.DB);
+        return handleAdminUI(request, env, sys);
+      }},
       { method: 'POST', path: '/update', handler: () => handleUpdate(request, env, ctx) },
-      { method: 'GET', path: '/api/server', handler: () => handleServerAPI(request, env, sys) },
-      { method: 'GET', path: '/api/servers', handler: () => handleServersAPI(request, env, sys) },
-      { method: 'GET', path: '/api/history', handler: () => {
+      { method: 'GET', path: '/api/server', handler: async () => {
+        const sys = await loadSettings(env.DB);
+        return handleServerAPI(request, env, sys);
+      }},
+      { method: 'GET', path: '/api/servers', handler: async () => {
+        const sys = await loadSettings(env.DB);
+        return handleServersAPI(request, env, sys);
+      }},
+      { method: 'GET', path: '/api/history', handler: async () => {
         const id = url.searchParams.get('id');
         const metric = url.searchParams.get('metric') || 'cpu';
         const hours = parseFloat(url.searchParams.get('hours') || '24');
-        return fetchHistoryData(env, sys, request, id, hours, metric);
+        return fetchHistoryData(env, request, id, hours, metric);
       }},
-      { method: 'GET', path: '/api/history/all', handler: () => {
+      { method: 'GET', path: '/api/history/all', handler: async () => {
         const id = url.searchParams.get('id');
         const hours = parseFloat(url.searchParams.get('hours') || '24');
         const allColumns = 'cpu, ram, disk, processes, net_in_speed, net_out_speed, tcp_conn, udp_conn, ping_ct, ping_cu, ping_cm, ping_bd';
-        return fetchHistoryData(env, sys, request, id, hours, allColumns);
+        return fetchHistoryData(env, request, id, hours, allColumns);
       }},
-      { method: 'GET', path: '/api/history/agg', handler: () => {
+      { method: 'GET', path: '/api/history/agg', handler: async () => {
         const id = url.searchParams.get('id');
         const hours = parseFloat(url.searchParams.get('hours') || '24');
         const allColumns = 'cpu, ram, disk, processes, net_in_speed, net_out_speed, tcp_conn, udp_conn, ping_ct, ping_cu, ping_cm, ping_bd';
-        return fetchAggregatedHistoryData(env, sys, request, id, hours, allColumns);
+        return fetchAggregatedHistoryData(env, request, id, hours, allColumns);
       }},
-      { method: 'GET', path: '/', handler: () => {
+      { method: 'GET', path: '/', handler: async () => {
+        const sys = await loadSettings(env.DB);
         const viewId = url.searchParams.get('id');
         if (viewId) {
           return handleServerDetail(request, env, sys, viewId);

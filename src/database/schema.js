@@ -51,11 +51,6 @@ export async function initDatabase(db) {
         ping_cu TEXT DEFAULT '0',
         ping_cm TEXT DEFAULT '0',
         ping_bd TEXT DEFAULT '0',
-        monthly_rx TEXT DEFAULT '0',
-        monthly_tx TEXT DEFAULT '0',
-        last_rx TEXT DEFAULT '0',
-        last_tx TEXT DEFAULT '0',
-        reset_month TEXT DEFAULT '',
         is_hidden TEXT DEFAULT '0',
         sort_order INTEGER DEFAULT 0
       )
@@ -155,11 +150,6 @@ export async function initDatabase(db) {
       ping_cu: "TEXT DEFAULT '0'",
       ping_cm: "TEXT DEFAULT '0'",
       ping_bd: "TEXT DEFAULT '0'",
-      monthly_rx: "TEXT DEFAULT '0'",
-      monthly_tx: "TEXT DEFAULT '0'",
-      last_rx: "TEXT DEFAULT '0'",
-      last_tx: "TEXT DEFAULT '0'",
-      reset_month: "TEXT DEFAULT ''",
       cpu_cores: "TEXT DEFAULT '0'",
       is_hidden: "TEXT DEFAULT '0'",
       sort_order: "INTEGER DEFAULT 0"

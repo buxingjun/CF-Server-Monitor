@@ -21,15 +21,35 @@ async function fetchWithRetry(url, options, retries = MAX_RETRIES) {
   throw new Error('Max retries exceeded');
 }
 
-export async function sendTelegramNotification(sys, msg) {
-  if (sys.tg_notify !== 'true' || !sys.tg_bot_token || !sys.tg_chat_id) return;
+async function loadNotificationSettings(db) {
+  const { results } = await db.prepare(
+    "SELECT key, value FROM settings WHERE key IN ('tg_notify', 'tg_bot_token', 'tg_chat_id')"
+  ).all();
+  
+  const settings = {
+    tg_notify: 'false',
+    tg_bot_token: '',
+    tg_chat_id: ''
+  };
+  
+  if (results) {
+    results.forEach(r => {
+      settings[r.key] = r.value;
+    });
+  }
+  
+  return settings;
+}
+
+export async function sendTelegramNotification(settings, msg) {
+  if (settings.tg_notify !== 'true' || !settings.tg_bot_token || !settings.tg_chat_id) return;
   
   try {
-    await fetchWithRetry(`https://api.telegram.org/bot${sys.tg_bot_token}/sendMessage`, {
+    await fetchWithRetry(`https://api.telegram.org/bot${settings.tg_bot_token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        chat_id: sys.tg_chat_id,
+        chat_id: settings.tg_chat_id,
         text: msg,
         parse_mode: 'Markdown'
       })
@@ -39,11 +59,11 @@ export async function sendTelegramNotification(sys, msg) {
   }
 }
 
-export async function sendWeworkNotification(sys, msg) {
-  if (sys.tg_notify !== 'true' || !sys.tg_bot_token) return;
+export async function sendWeworkNotification(settings, msg) {
+  if (settings.tg_notify !== 'true' || !settings.tg_bot_token) return;
 
   try {
-    await fetchWithRetry(sys.tg_bot_token, {
+    await fetchWithRetry(settings.tg_bot_token, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -56,8 +76,9 @@ export async function sendWeworkNotification(sys, msg) {
   }
 }
 
-export async function checkOfflineNodes(db, sys) {
-  if (sys.tg_notify !== 'true') return;
+export async function checkOfflineNodes(db) {
+  const notifySettings = await loadNotificationSettings(db);
+  if (notifySettings.tg_notify !== 'true') return;
   
   try {
     const { results: allServers } = await db.prepare(
@@ -91,8 +112,8 @@ export async function checkOfflineNodes(db, sys) {
           `**状态:** 离线 (超过5分钟未上报)\n` +
           `**时间:** ${new Date().toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})}`;
         
-        await sendTelegramNotification(sys, msg);
-        await sendWeworkNotification(sys, msg);
+        await sendTelegramNotification(notifySettings, msg);
+        await sendWeworkNotification(notifySettings, msg);
         
         alertState[s.id] = true;
         stateChanged = true;
@@ -102,8 +123,8 @@ export async function checkOfflineNodes(db, sys) {
           `**状态:** 恢复在线\n` +
           `**时间:** ${new Date().toLocaleString('zh-CN', {timeZone: 'Asia/Shanghai'})}`;
         
-        await sendTelegramNotification(sys, msg);
-        await sendWeworkNotification(sys, msg);
+        await sendTelegramNotification(notifySettings, msg);
+        await sendWeworkNotification(notifySettings, msg);
         
         delete alertState[s.id];
         stateChanged = true;

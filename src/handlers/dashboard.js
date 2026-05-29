@@ -58,15 +58,8 @@ export async function handleServersAPI(request, env, sys) {
       globalSpeedOut += parseFloat(server.net_out_speed) || 0;
     }
     
-    const rx_val = sys.auto_reset_traffic === 'true' 
-      ? parseFloat(server.monthly_rx || 0) 
-      : parseFloat(server.net_rx || 0);
-    const tx_val = sys.auto_reset_traffic === 'true' 
-      ? parseFloat(server.monthly_tx || 0) 
-      : parseFloat(server.net_tx || 0);
-    
-    globalNetTx += tx_val;
-    globalNetRx += rx_val;
+    globalNetRx += parseFloat(server.net_rx || 0);
+    globalNetTx += parseFloat(server.net_tx || 0);
     
     let cCode = (server.country || 'xx').toUpperCase();
     if (cCode === 'TW') cCode = 'CN';
@@ -729,7 +722,7 @@ export async function handleDashboard(request, env, sys) {
         </div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">Total Traffic ${sys.auto_reset_traffic === 'true' ? '[MONTH]' : ''}</div>
+        <div class="stat-label">Total Traffic</div>
         <div class="stat-main-value" style="font-size:16px;">- ↓ | ↑ -</div>
       </div>
       <div class="stat-item">
@@ -788,8 +781,7 @@ export async function handleDashboard(request, env, sys) {
     show_price: sys.show_price === 'true',
     show_expire: sys.show_expire === 'true',
     show_bw: sys.show_bw === 'true',
-    show_tf: sys.show_tf === 'true',
-    auto_reset_traffic: sys.auto_reset_traffic === 'true'
+    show_tf: sys.show_tf === 'true'
   })}</script>
   <script>
     let mapInitialized = false;
@@ -860,8 +852,8 @@ export async function handleDashboard(request, env, sys) {
           const disk = parseFloat(server.disk || 0).toFixed(1);
           const netInSpeed = formatBytes(server.net_in_speed);
           const netOutSpeed = formatBytes(server.net_out_speed);
-          const monthlyRx = formatBytes(server.monthly_rx);
-          const monthlyTx = formatBytes(server.monthly_tx);
+          const totalRx = formatBytes(server.net_rx);
+          const totalTx = formatBytes(server.net_tx);
           const cCode = (server.country || 'xx').toLowerCase();
           const flagHtml = cCode !== 'xx' 
             ? '<img src="https://flagcdn.com/24x18/' + cCode + '.png" alt="' + cCode + '" style="vertical-align: middle; margin-right: 5px; border-radius: 2px; filter: brightness(0.9);">' 
@@ -912,7 +904,7 @@ export async function handleDashboard(request, env, sys) {
               '<div class="stat-row"><span class="stat-key">RAM</span><div class="stat-bar-container"><div class="stat-bar-fill" style="width:' + ram + '%; background: var(--accent-purple);"></div></div><span class="stat-value">' + ram + '%</span></div>' +
               '<div class="stat-row"><span class="stat-key">DISK</span><div class="stat-bar-container"><div class="stat-bar-fill" style="width:' + disk + '%; background: var(--accent-green);"></div></div><span class="stat-value">' + disk + '%</span></div>' +
               '<div class="stat-row"><span class="stat-key">NET</span><span class="net-down">▼ ' + netInSpeed + '/s</span><span class="net-up">▲ ' + netOutSpeed + '/s</span></div>' +
-              '<div class="stat-row"><span class="stat-key">TRF</span><span class="net-down">▼ ' + monthlyRx + '</span><span class="net-up">▲ ' + monthlyTx + '</span></div>' +
+              '<div class="stat-row"><span class="stat-key">TRF</span><span class="net-down">▼ ' + totalRx + '</span><span class="net-up">▲ ' + totalTx + '</span></div>' +
             '</div>' +
             pingHtml +
           '</a>';
@@ -938,8 +930,8 @@ export async function handleDashboard(request, env, sys) {
         const disk = parseFloat(server.disk || 0).toFixed(1);
         const netInSpeed = formatBytes(server.net_in_speed);
         const netOutSpeed = formatBytes(server.net_out_speed);
-        const monthlyRx = formatBytes(server.monthly_rx);
-        const monthlyTx = formatBytes(server.monthly_tx);
+        const totalRx = formatBytes(server.net_rx);
+        const totalTx = formatBytes(server.net_tx);
         const cCode = (server.country || 'xx').toLowerCase();
         const flagHtml = cCode !== 'xx' 
           ? '<img src="https://flagcdn.com/24x18/' + cCode + '.png" alt="' + cCode + '" style="vertical-align: middle; border-radius: 2px; filter: brightness(0.9);">' 
@@ -956,8 +948,8 @@ export async function handleDashboard(request, env, sys) {
           '<td><div class="table-stat"><div class="stat-bar-container" style="width:60px;"><div class="stat-bar-fill" style="width:' + disk + '%; background: var(--accent-green);"></div></div><span>' + disk + '%</span></div></td>' +
           '<td>' + netInSpeed + '/s</td>' +
           '<td>' + netOutSpeed + '/s</td>' +
-          '<td>' + monthlyRx + '</td>' +
-          '<td>' + monthlyTx + '</td>' +
+          '<td>' + totalRx + '</td>' +
+          '<td>' + totalTx + '</td>' +
           '<td class="update-time">' + updateSec + 's ago</td>' +
         '</tr>';
       }
@@ -965,7 +957,6 @@ export async function handleDashboard(request, env, sys) {
     }
     
     function renderStats(stats) {
-      const trafficLabel = sysConfig.auto_reset_traffic ? '[MONTH]' : '';
       return '<div class="stat-item">' +
         '<div class="stat-label">Total Servers</div>' +
         '<div class="stat-main-value">' + stats.total + '</div>' +
@@ -975,7 +966,7 @@ export async function handleDashboard(request, env, sys) {
         '</div>' +
       '</div>' +
       '<div class="stat-item">' +
-        '<div class="stat-label">Total Traffic ' + trafficLabel + '</div>' +
+        '<div class="stat-label">Total Traffic</div>' +
         '<div class="stat-main-value" style="font-size:16px;">' + formatBytes(stats.globalNetRx) + ' ↓ | ↑ ' + formatBytes(stats.globalNetTx) + '</div>' +
       '</div>' +
       '<div class="stat-item">' +

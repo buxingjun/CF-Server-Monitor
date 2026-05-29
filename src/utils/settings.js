@@ -14,8 +14,7 @@ export async function loadSettings(db) {
     show_tf: 'true',
     tg_notify: 'false',
     tg_bot_token: '',
-    tg_chat_id: '',
-    auto_reset_traffic: 'false'
+    tg_chat_id: ''
   };
 
   try {

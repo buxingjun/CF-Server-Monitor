@@ -995,12 +995,6 @@ export async function handleAdminUI(request, env, sys) {
                 <span>▸</span> Display Options
               </div>
               
-              <div class="checkbox-item highlight-box">
-                <input type="checkbox" id="cfg_auto_reset_traffic" ${sys.auto_reset_traffic === 'true' ? 'checked' : ''}>
-                <label><b>Monthly Traffic Reset</b><br><span style="font-size:10px;color:var(--text-muted);">Reset on 1st each month, persist across reboots</span></label>
-                <span class="checkbox-badge">MONTHLY</span>
-              </div>
-              
               <div class="checkbox-item">
                 <input type="checkbox" id="cfg_is_public" ${sys.is_public === 'true' ? 'checked' : ''}>
                 <label><b>Public Access</b></label>
@@ -1178,7 +1172,6 @@ export async function handleAdminUI(request, env, sys) {
           site_title: document.getElementById('cfg_site_title').value,
           admin_title: document.getElementById('cfg_admin_title').value,
           is_public: document.getElementById('cfg_is_public').checked ? 'true' : 'false',
-          auto_reset_traffic: document.getElementById('cfg_auto_reset_traffic').checked ? 'true' : 'false',
           show_price: document.getElementById('cfg_show_price').checked ? 'true' : 'false',
           show_expire: document.getElementById('cfg_show_expire').checked ? 'true' : 'false',
           show_bw: document.getElementById('cfg_show_bw').checked ? 'true' : 'false',
