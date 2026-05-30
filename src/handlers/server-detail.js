@@ -929,8 +929,14 @@ export async function handleServerDetail(request, env, sys, viewId) {
         document.getElementById('val-traffic-in').innerText = formatBytes(data.net_rx);
         document.getElementById('val-traffic-out').innerText = formatBytes(data.net_tx);
         document.getElementById('val-last-report').innerText = new Date(lastUpdatedTime).toLocaleString(undefined, { hour12: false });
-        document.getElementById('text-disk-detail').innerText = \`${t('Used')} \${(parseFloat(data.disk_used || 0)/1024).toFixed(2)} / \${(parseFloat(data.disk_total || 0)/1024).toFixed(2)} GiB\`;
-        document.getElementById('text-swap').innerText = \`${t('Swap')}: \${data.swap_used || '0'} / \${data.swap_total || '0'} MiB\`;
+        document.getElementById('text-disk-detail').innerText =
+          t('Used') + ' ' +
+          (parseFloat(data.disk_used || 0) / 1024).toFixed(2) + ' / ' +
+          (parseFloat(data.disk_total || 0) / 1024).toFixed(2) + ' GiB';
+        document.getElementById('text-swap').innerText =
+          t('Swap') + ': ' +
+          (data.swap_used || '0') + ' / ' +
+          (data.swap_total || '0') + ' MiB';
         document.getElementById('t-ct').innerText = data.ping_ct + 'ms';
         document.getElementById('t-cu').innerText = data.ping_cu + 'ms';
         document.getElementById('t-cm').innerText = data.ping_cm + 'ms';
