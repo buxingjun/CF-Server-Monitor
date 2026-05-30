@@ -56,6 +56,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
     ? `<img src="https://flagcdn.com/24x18/${cCode}.png" alt="${cCode}" style="vertical-align: middle; margin-right: 6px; border-radius: 2px; filter: brightness(0.9);">` 
     : '🏳️ ';
 
+  const lang = sys.lang === 'en' ? 'en' : 'zh';
   const themeStyles = getThemeStyles(sys);
 
   const detailHtml = `<!DOCTYPE html>
@@ -521,6 +522,171 @@ export async function handleServerDetail(request, env, sys, viewId) {
     /* 主题样式保留 */
     ${themeStyles}
   </style>
+
+<style id="detail-font-override">
+  * {
+    font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "JetBrains Mono", monospace !important;
+  }
+
+  body {
+    font-size: 18px !important;
+    line-height: 1.75 !important;
+  }
+
+  .container {
+    max-width: 1700px !important;
+  }
+
+  .terminal-header {
+    font-size: 16px !important;
+    padding: 14px 20px !important;
+  }
+
+  .terminal-title {
+    font-size: 18px !important;
+  }
+
+  .nav-bar {
+    padding: 16px 20px !important;
+  }
+
+  .back-btn,
+  .time-btn {
+    font-size: 16px !important;
+    padding: 10px 18px !important;
+  }
+
+  .host-card-header {
+    padding: 20px 24px !important;
+  }
+
+  .host-name {
+    font-size: 23px !important;
+  }
+
+  .status-badge {
+    font-size: 16px !important;
+    padding: 6px 14px !important;
+  }
+
+  .pulse-dot {
+    width: 9px !important;
+    height: 9px !important;
+  }
+
+  .sysinfo-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+  }
+
+  .sysinfo-item {
+    padding: 18px 20px !important;
+  }
+
+  .sysinfo-label {
+    font-size: 16px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .sysinfo-value {
+    font-size: 18px !important;
+  }
+
+  #val-cpuinfo,
+  #val-boot {
+    font-size: 16px !important;
+  }
+
+  .charts-container {
+    gap: 20px !important;
+  }
+
+  .chart-card-header {
+    padding: 18px 22px !important;
+  }
+
+  .chart-title {
+    font-size: 19px !important;
+  }
+
+  .chart-title-icon {
+    font-size: 18px !important;
+  }
+
+  .chart-current-value {
+    font-size: 24px !important;
+  }
+
+  .chart-subtitle {
+    font-size: 16px !important;
+  }
+
+  .net-indicator {
+    font-size: 17px !important;
+    gap: 20px !important;
+  }
+
+  .chart-body {
+    padding: 20px !important;
+  }
+
+  .chart-body canvas {
+    height: 260px !important;
+  }
+
+  .chart-card.full-width .chart-body canvas,
+  #chartPing {
+    height: 360px !important;
+  }
+
+  .status-bar {
+    font-size: 16px !important;
+    padding: 14px 20px !important;
+  }
+
+  @media (max-width: 768px) {
+    body {
+      font-size: 16px !important;
+    }
+
+    .container {
+      padding: 8px !important;
+    }
+
+    .host-name {
+      font-size: 19px !important;
+    }
+
+    .back-btn,
+    .time-btn {
+      font-size: 14px !important;
+      padding: 8px 12px !important;
+    }
+
+    .sysinfo-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    .sysinfo-label {
+      font-size: 14px !important;
+    }
+
+    .sysinfo-value {
+      font-size: 16px !important;
+    }
+
+    .chart-title {
+      font-size: 16px !important;
+    }
+
+    .chart-current-value {
+      font-size: 20px !important;
+    }
+
+    .chart-body canvas {
+      height: 220px !important;
+    }
+  }
+</style>
 </head>
 <body class="${sys.theme || 'theme1'}">
   <div class="container">
@@ -646,7 +812,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
           <div>
             <span class="chart-current-value" id="text-ram">${server.ram || '0'}%</span>
             <div class="chart-subtitle" id="text-swap">
-              Swap: ${server.swap_used || '0'} / ${server.swap_total || '0'} MiB
+              `${t('Swap')}: ${data.swap_used || '0'} / ${data.swap_total || '0'} MiB`;
             </div>
           </div>
         </div>
@@ -757,6 +923,100 @@ export async function handleServerDetail(request, env, sys, viewId) {
   </div>
 
   <script>
+    const DETAIL_LANG = '${lang}';
+
+    const DETAIL_I18N = {
+      zh: {
+        'cd ..': '返回首页',
+        'ONLINE': '在线',
+        'OFFLINE': '离线',
+
+        'Uptime': '运行时间',
+        'Architecture': '架构',
+        'CPU Model': 'CPU 型号',
+        'CPU Cores': 'CPU 核心',
+        'Load Average': '平均负载',
+        'Boot Time': '启动时间',
+        'Total RAM': '总内存',
+        'Total Disk': '总磁盘',
+        'Traffic In': '入站流量',
+        'Traffic Out': '出站流量',
+        'Last Report': '最后上报',
+
+        'CPU Usage': 'CPU 使用率',
+        'Memory Usage': '内存使用率',
+        'Disk Usage': '磁盘使用率',
+        'Network Traffic': '网络流量',
+        'Processes': '进程数',
+        'Connections': '连接数',
+        'Latency Monitor': '延迟监控',
+
+        'Swap': '交换分区',
+        'Used': '已用',
+        'Download': '下载',
+        'Upload': '上传',
+        'Count': '数量',
+        'Latency': '延迟',
+
+        'Last update': '最后更新',
+        'just now': '刚刚',
+        'Auto-refresh: 60s (status)': '自动刷新：60秒（状态）'
+      },
+      en: {}
+    };
+
+    function t(text) {
+      if (DETAIL_LANG !== 'zh') return text;
+      return DETAIL_I18N.zh[text] || text;
+    }
+
+    function translateDetailText(text) {
+      if (DETAIL_LANG !== 'zh') return text;
+
+      let result = text;
+      Object.entries(DETAIL_I18N.zh)
+        .sort((a, b) => b[0].length - a[0].length)
+        .forEach(([from, to]) => {
+          result = result.replaceAll(from, to);
+        });
+
+      return result;
+    }
+
+    function translateDetailUI() {
+      if (DETAIL_LANG !== 'zh') return;
+
+      const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode(node) {
+            if (!node.nodeValue || !node.nodeValue.trim()) {
+              return NodeFilter.FILTER_REJECT;
+            }
+
+            if (
+              node.parentElement &&
+              ['SCRIPT', 'STYLE', 'TEXTAREA', 'CANVAS'].includes(node.parentElement.tagName)
+            ) {
+              return NodeFilter.FILTER_REJECT;
+            }
+
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        }
+      );
+
+      const nodes = [];
+      while (walker.nextNode()) {
+        nodes.push(walker.currentNode);
+      }
+
+      nodes.forEach(node => {
+        node.nodeValue = translateDetailText(node.nodeValue);
+      });
+    }
+
     // =============================================
     // 配置
     // =============================================
@@ -780,15 +1040,15 @@ export async function handleServerDetail(request, env, sys, viewId) {
     // Chart.js 终端风格全局配置
     // =============================================
     Chart.defaults.font.family = "'JetBrains Mono', 'Courier New', monospace";
-    Chart.defaults.font.size = 10;
+    Chart.defaults.font.size = 14;
     Chart.defaults.color = '#8999af';
     Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(10, 14, 20, 0.95)';
     Chart.defaults.plugins.tooltip.titleColor = '#00d4aa';
     Chart.defaults.plugins.tooltip.bodyColor = '#d3dae3';
     Chart.defaults.plugins.tooltip.borderColor = '#1e2a3a';
     Chart.defaults.plugins.tooltip.borderWidth = 1;
-    Chart.defaults.plugins.tooltip.titleFont = { size: 12, weight: 'bold', family: "'JetBrains Mono', monospace" };
-    Chart.defaults.plugins.tooltip.bodyFont = { size: 11, family: "'JetBrains Mono', monospace" };
+    Chart.defaults.plugins.tooltip.titleFont = { size: 15, weight: 'bold', family: "'JetBrains Mono', monospace" };
+    Chart.defaults.plugins.tooltip.bodyFont = { size: 14, family: "'JetBrains Mono', monospace" };
     Chart.defaults.plugins.tooltip.padding = 12;
     Chart.defaults.plugins.tooltip.cornerRadius = 2;
     Chart.defaults.plugins.tooltip.displayColors = true;
@@ -813,7 +1073,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
           labels: {
             boxWidth: 10,
             padding: 12,
-            font: { size: 10, family: "'JetBrains Mono', monospace" },
+            font: { size: 13, family: "'JetBrains Mono', monospace" },
             usePointStyle: true,
             color: '#8999af',
           }
@@ -863,7 +1123,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
           ticks: {
             maxTicksLimit: 8,
             color: '#5c6d82',
-            font: { size: 9, family: "'JetBrains Mono', monospace" },
+            font: { size: 12, family: "'JetBrains Mono', monospace" },
             maxRotation: 0,
             padding: 8
           },
@@ -940,7 +1200,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
       type: 'line',
       data: { 
         datasets: [{ 
-          label: 'Memory', 
+          label: t('Memory'),
           data: [], 
           borderColor: '#b392f0', 
           backgroundColor: 'rgba(179, 146, 240, 0.05)', 
@@ -956,7 +1216,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
       type: 'line',
       data: { 
         datasets: [{ 
-          label: 'Disk', 
+          label: t('Disk'), 
           data: [], 
           borderColor: '#39d2c0', 
           backgroundColor: 'rgba(57, 210, 192, 0.05)', 
@@ -972,7 +1232,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
       type: 'line',
       data: { 
         datasets: [{ 
-          label: 'Processes', 
+          label: t('Processes'),
           data: [], 
           borderColor: '#f778ba', 
           backgroundColor: 'rgba(247, 120, 186, 0.03)', 
@@ -980,7 +1240,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
           borderWidth: 1.5
         }] 
       },
-      options: createChartOptions('', false, 'Count')
+      options: createChartOptions('', false, t('Count'))
     });
     
     // 网络速度图表 (双线)
@@ -989,7 +1249,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
       data: {
         datasets: [
           { 
-            label: 'Download', 
+            label: label: t('Download'), 
             data: [], 
             borderColor: '#00d4aa', 
             backgroundColor: 'rgba(0, 212, 170, 0.03)', 
@@ -1000,7 +1260,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
             hoverRadius: 5 
           },
           { 
-            label: 'Upload', 
+            label: t('Upload'), 
             data: [], 
             borderColor: '#4da6ff', 
             backgroundColor: 'rgba(77, 166, 255, 0.03)', 
@@ -1042,7 +1302,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
           }
         ]
       },
-      options: createChartOptions('', true, 'Connections')
+      options: createChartOptions('', true, t('Connections'))
     });
     
     // 延迟图表 (四线) - 保持原有颜色但有终端风格
@@ -1092,7 +1352,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
           }
         ]
       },
-      options: createChartOptions(' ms', true, 'Latency')
+      options: createChartOptions(' ms', true, t('Latency'))
     });
     
     // =============================================
@@ -1322,7 +1582,7 @@ export async function handleServerDetail(request, env, sys, viewId) {
         const lastUpdatedTime = new Date(data.last_updated).getTime();
         const isOnline = (Date.now() - lastUpdatedTime) < 300000;
         const badge = document.getElementById('head-status');
-        badge.innerHTML = \`<span class="pulse-dot \${isOnline ? 'online' : 'offline'}"></span>\${isOnline ? 'ONLINE' : 'OFFLINE'}\`;
+        badge.innerHTML = `<span class="pulse-dot ${isOnline ? 'online' : 'offline'}"></span>${isOnline ? t('ONLINE') : t('OFFLINE')}`;
         badge.className = 'status-badge ' + (isOnline ? 'online' : 'offline');
         
         const cCode = (data.country || 'xx').toLowerCase();
@@ -1345,9 +1605,9 @@ export async function handleServerDetail(request, env, sys, viewId) {
         document.getElementById('val-last-report').innerText = new Date(lastUpdatedTime).toLocaleString(undefined, { hour12: false });
         
         document.getElementById('text-disk-detail').innerText = 
-          \`Used \${(parseFloat(data.disk_used)/1024).toFixed(2)} / \${(parseFloat(data.disk_total)/1024).toFixed(2)} GiB\`;
+          `${t('Used')} ${(parseFloat(data.disk_used)/1024).toFixed(2)} / ${(parseFloat(data.disk_total)/1024).toFixed(2)} GiB`;
         document.getElementById('text-swap').innerText = 
-          \`Swap: \${data.swap_used || '0'} / \${data.swap_total || '0'} MiB\`;
+          `${t('Swap')}: ${data.swap_used || '0'} / ${data.swap_total || '0'} MiB`;
         
         document.getElementById('t-ct').innerText = data.ping_ct + 'ms';
         document.getElementById('t-cu').innerText = data.ping_cu + 'ms';
@@ -1415,8 +1675,9 @@ export async function handleServerDetail(request, env, sys, viewId) {
       console.log('[INFO] Connection closed');
     });
     
-    // 启动
-    init();
+   // 启动
+   translateDetailUI();
+   init();
   </script>
   ${sys.custom_script || ''}
 </body>
