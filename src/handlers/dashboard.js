@@ -736,107 +736,213 @@ const themeStyles = getThemeStyles(sys);
     
     ${themeStyles}
 
-/* 字体整体放大 */
+/* 前台字体整体加大版 */
 body {
-  font-size: 16px !important;
-  line-height: 1.65 !important;
+  font-size: 18px !important;
+  line-height: 1.75 !important;
   font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "JetBrains Mono", monospace !important;
 }
 
-/* 顶部标题 */
-.terminal-title,
-.site-title {
+/* 页面宽度稍微放大，避免字体变大后太挤 */
+.container {
+  max-width: 1700px !important;
+}
+
+/* 顶部栏 */
+.terminal-header {
+  font-size: 16px !important;
+  padding: 14px 20px !important;
+}
+
+.terminal-title {
   font-size: 18px !important;
 }
 
-/* 视图切换按钮、后台入口 */
-.toggle-btn,
-.admin-link,
-.filter-tag {
-  font-size: 14px !important;
-}
-
-/* 统计区域 */
-.stat-label {
-  font-size: 13px !important;
-}
-
-.stat-main-value {
+.site-title {
   font-size: 22px !important;
 }
 
+/* 顶部按钮：卡片 / 表格 / 地图 / 后台 */
+.toggle-btn,
+.admin-link {
+  font-size: 16px !important;
+  padding: 10px 18px !important;
+}
+
+/* 国家过滤标签 */
+.filter-tag {
+  font-size: 16px !important;
+  padding: 8px 16px !important;
+}
+
+/* 全局统计卡片 */
+.stat-item {
+  padding: 18px 20px !important;
+}
+
+.stat-label {
+  font-size: 16px !important;
+  margin-bottom: 8px !important;
+}
+
+.stat-main-value {
+  font-size: 28px !important;
+}
+
+.stat-main-value[style] {
+  font-size: 24px !important;
+}
+
 .stat-sub-info {
-  font-size: 14px !important;
+  font-size: 17px !important;
 }
 
 /* 分组标题 */
 .group-header {
-  font-size: 16px !important;
+  font-size: 19px !important;
+  padding: 12px 0 !important;
 }
 
 .group-count {
-  font-size: 13px !important;
+  font-size: 16px !important;
+}
+
+/* 卡片网格，字体大后卡片也加宽 */
+.servers-grid {
+  grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)) !important;
+  gap: 16px !important;
 }
 
 /* 服务器卡片 */
+.server-card {
+  padding: 20px !important;
+}
+
 .server-name {
-  font-size: 16px !important;
+  font-size: 20px !important;
 }
 
 .server-meta,
 .card-meta {
-  font-size: 14px !important;
+  font-size: 17px !important;
 }
 
 .status-label {
-  font-size: 12px !important;
+  font-size: 15px !important;
+  padding: 4px 10px !important;
+}
+
+/* 小标签：带宽、流量、IPv4、IPv6 */
+.badge {
+  font-size: 13px !important;
+  padding: 4px 8px !important;
 }
 
 /* CPU / RAM / DISK / NET / TRF */
+.stat-row {
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+}
+
 .stat-key {
-  font-size: 13px !important;
-  width: 46px !important;
+  font-size: 16px !important;
+  width: 56px !important;
 }
 
 .stat-value,
 .net-down,
 .net-up {
-  font-size: 14px !important;
+  font-size: 17px !important;
+}
+
+.stat-bar-container {
+  height: 7px !important;
 }
 
 /* Ping 区域 */
+.ping-panel {
+  gap: 8px !important;
+  padding: 12px !important;
+}
+
 .ping-label {
-  font-size: 12px !important;
+  font-size: 15px !important;
 }
 
 .ping-value {
-  font-size: 13px !important;
+  font-size: 16px !important;
 }
 
-/* 表格 */
+/* 表格视图 */
 .terminal-table {
-  font-size: 15px !important;
+  font-size: 17px !important;
 }
 
 .terminal-table th {
-  font-size: 13px !important;
+  font-size: 15px !important;
+  padding: 14px 16px !important;
 }
 
 .terminal-table td {
-  font-size: 15px !important;
+  font-size: 17px !important;
+  padding: 14px 16px !important;
 }
 
 .os-label,
 .update-time {
-  font-size: 14px !important;
+  font-size: 16px !important;
 }
 
-/* 空状态、加载状态 */
+/* 空状态 / 加载状态 */
 .empty-state,
 .loading-state {
-  font-size: 15px !important;
+  font-size: 18px !important;
 }
 
+/* 地图高度也稍微加大 */
+#map-container {
+  height: 560px !important;
+}
+
+/* 手机端避免撑爆 */
+@media (max-width: 768px) {
+  body {
+    font-size: 16px !important;
+  }
+
+  .site-title {
+    font-size: 18px !important;
+  }
+
+  .toggle-btn,
+  .admin-link,
+  .filter-tag {
+    font-size: 14px !important;
+    padding: 8px 12px !important;
+  }
+
+  .servers-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .server-name {
+    font-size: 18px !important;
+  }
+
+  .stat-main-value {
+    font-size: 24px !important;
+  }
+
+  .terminal-table {
+    font-size: 15px !important;
+  }
+
+  .terminal-table th,
+  .terminal-table td {
+    font-size: 15px !important;
+    padding: 10px 12px !important;
+  }
+}
 </style>
 </head>
 <body class="${sys.theme || 'theme1'}">
